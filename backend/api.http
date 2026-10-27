@@ -1,0 +1,8 @@
+GET {baseUrl}}/api/products?search=react
+
+GET {baseUrl}}/api/products?sort=price-asc
+
+GET {baseUrl}}/api/products?category=React&search=learning&sort=title_desc
+
+GET{baseUrl}}api/products?sort=pret
+

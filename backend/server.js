@@ -106,9 +106,31 @@ const saveProducts = (products) => {
  *  - category: filtrare după categorie (fără a ține cont de majuscule)
  * Exemplu: /api/products?category=React
  */
+const effectivePrice = (product) => product.discountPrice ?? product.price;
+
+const SORT_OPTIONS = {
+  price_asc: (a, b) => effectivePrice(a) - effectivePrice(b), //PRET CRESCATOR
+  price_desc: (a, b) => effectivePrice(b) - effectivePrice(a), //PRET DESCRESCATOR
+  title_asc: (a, b) => a.title.localeCompare(b.title), //TITLU CRESCATOR A - Z
+  title_desc: (a, b) => b.title.localeCompare(a.title), //TITLU DESCRESCATOR Z - A
+  newest: (a, b) => new Date(b.createdAt) - new Date(a.createdAt), //CELE MAI NOI inati
+}  
+
+const queryText = (value) => (typeof value === 'string' ? value.trim() : '');
+
 app.get('/api/products', (req, res) => {
   try {
-    const { category } = req.query;
+    const category  = queryText(req.query.category);
+    const search    = queryText(req.query.search);
+    const sort      = queryText(req.query.sort);
+
+    if (sort && !SORT_OPTIONS[sort]) {
+      return res.status(400).json({
+        success: false,
+        message: `Sortare invalida: "{sort}`,
+        allowedSorts: Object.keys(SORT_OPTIONS),
+      });
+    }
 
     let products = readProducts().filter((p) => p.isActive === true);
 
@@ -117,6 +139,19 @@ app.get('/api/products', (req, res) => {
         (p) => p.category.toLowerCase() === category.toLowerCase()
       );
     }
+
+      if(search) {
+        const keyword = search.toLowerCase();
+        products = products.filter(
+          (p) => p.title.toLowerCase().includes(keyword) ||
+           p.author.toLowerCase().includes(keyword)
+        );
+      }
+
+      if (sort) {
+        products = products.toSorted(SORT_OPTIONS[sort]);
+      }
+    
 
     res.json({
       success: true,
@@ -130,10 +165,10 @@ app.get('/api/products', (req, res) => {
     console.error('Eroare la obținerea produselor:', error);
     res.status(500).json({
       success: false,
-      message: 'Eroare server'
+      message: 'Eroare server'});
+    }
     });
-  }
-});
+
 
 /**
  * GET /api/products/:id – un singur produs activ
@@ -177,6 +212,8 @@ const apiInfo = (req, res) => {
     endpoints: {
       'GET /api/products': 'Toate produsele active',
       'GET /api/products?category=React': 'Filtrare după categorie',
+      'GET /api/products?search=react':'Cautare in titlu sau autor',
+      'GET /api/products?sort=price-asc': 'Sortare: price_asc, price_desc, title_asc, title_desc, newest',
       'GET /api/products/:id': 'Un singur produs',
     },
     author: 'SDBIS',

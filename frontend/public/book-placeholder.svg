@@ -1,0 +1,8 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450">
+  <rect width="300" height="450" fill="#e9edf2"/>
+  <rect x="70" y="120" width="160" height="210" rx="10" fill="#cfd8e3"/>
+  <rect x="90" y="150" width="120" height="14" rx="7" fill="#9aa9bb"/>
+  <rect x="90" y="176" width="90" height="14" rx="7" fill="#9aa9bb"/>
+  <text x="150" y="380" font-family="Arial, sans-serif" font-size="20" fill="#6b7a8c" text-anchor="middle">Copertă indisponibilă</text>
+</svg>
